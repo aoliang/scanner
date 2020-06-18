@@ -1,4 +1,4 @@
-package meta
+package module
 
 import (
 	"bufio"
@@ -7,12 +7,17 @@ import (
 	"strings"
 )
 
-var project string
+var module string
 
 func init() {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
 	f, err := os.Open("go.mod")
 	if err != nil {
-		panic("go.mod not exist.")
+		panic("go.mod not exist. pwd=" + dir)
 	}
 
 	buf := bufio.NewReader(f)
@@ -24,17 +29,20 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		project = strings.TrimSpace(strings.TrimLeft(line, "module"))
-		if project == "" {
+		module = strings.TrimSpace(strings.TrimLeft(line, "module"))
+		if module == "" {
 			continue
+		}
+		if module != "" {
+			break
 		}
 	}
 
-	if project == "" {
+	if module == "" {
 		panic("go.mod has no module declaration")
 	}
 }
 
-func GetProject() string {
-	return project
+func Get() string {
+	return module
 }
